@@ -1,18 +1,17 @@
 #ifndef Camera_hpp
 #define Camera_hpp
+
 #define GLM_ENABLE_EXPERIMENTAL  // Enable experimental features
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
-#include <string>
-
 namespace gps {
     
-    enum MOVE_DIRECTION {MOVE_FORWARD, MOVE_BACKWARD, MOVE_RIGHT, MOVE_LEFT, MOVE_UP, MOVE_DOWN};
-    
-    class Camera
-    {
+    enum MOVE_DIRECTION {MOVE_FORWARD, MOVE_BACKWARD, MOVE_RIGHT, MOVE_LEFT, MOVE_UP, MOVE_DOWN };
+
+    class Camera {
+
     public:
         //Camera constructor
         Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 cameraUp);
@@ -24,6 +23,9 @@ namespace gps {
         //yaw - camera rotation around the y axis
         //pitch - camera rotation around the x axis
         void rotate(float pitch, float yaw);
+        void initialize(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 cameraUp);
+        void setPitch(float pitch);
+        void setYaw(float yaw);
         
     private:
         glm::vec3 cameraPosition;
@@ -31,11 +33,11 @@ namespace gps {
         glm::vec3 cameraFrontDirection;
         glm::vec3 cameraRightDirection;
         glm::vec3 cameraUpDirection;
+        glm::vec3 cameraSceneUpDirection;
 
         float yaw;
         float pitch;
-    };
-    
+    };    
 }
 
 #endif /* Camera_hpp */

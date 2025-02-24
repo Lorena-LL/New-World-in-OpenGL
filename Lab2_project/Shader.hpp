@@ -10,6 +10,7 @@
 #define Shader_hpp
 
 #if defined (__APPLE__)
+    #define GL_SILENCE_DEPRECATION
     #include <OpenGL/gl3.h>
 #else
     #define GLEW_STATIC

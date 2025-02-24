@@ -1,25 +1,40 @@
 #include "Camera.hpp"
+#include <glm/gtx/euler_angles.hpp>
 
 namespace gps {
 
-    //Camera constructor
-    Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 cameraUp) {
+    void Camera::initialize(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 cameraUp){
         this->cameraPosition = cameraPosition;
         this->cameraTarget = cameraTarget;
-        this->cameraUpDirection = cameraUp;
+        this->cameraSceneUpDirection = cameraUp;
         this->cameraFrontDirection = glm::normalize(cameraTarget - cameraPosition);
-        this->cameraRightDirection = glm::normalize(glm::cross(this->cameraFrontDirection, this->cameraUpDirection));
-
+        this->cameraRightDirection = -glm::normalize(glm::cross((-this->cameraFrontDirection), this->cameraSceneUpDirection));
+        this->cameraUpDirection = glm::cross(-this->cameraFrontDirection, this->cameraRightDirection);
 
         //TODO - Update the rest of camera parameters
-        this->yaw = 0.0f;
-        this->pitch = 0.0f;
+        glm::mat4 auxMatrix = this->getViewMatrix();
+        yaw = -glm::degrees(atan2(-auxMatrix[0][2], auxMatrix[2][2]));
+        pitch = -glm::degrees(asin(auxMatrix[1][2]));
+        /*yaw = -glm::degrees(asin(auxMatrix[1][2]));
+        pitch = -glm::degrees(atan2(-auxMatrix[0][2], auxMatrix[2][2]));*/
+    }
 
+    //Camera constructor
+    Camera::Camera(glm::vec3 cameraPosition, glm::vec3 cameraTarget, glm::vec3 cameraUp) {
+        this->initialize(cameraPosition, cameraTarget, cameraUp);
     }
 
     //return the view matrix, using the glm::lookAt() function
     glm::mat4 Camera::getViewMatrix() {
-        return glm::lookAt(cameraPosition, cameraTarget, cameraUpDirection);
+        return glm::lookAt(cameraPosition, cameraTarget, cameraSceneUpDirection);
+    }
+
+    void Camera::setYaw(float yaw) {
+        this->yaw = yaw;
+    }
+
+    void Camera::setPitch(float pitch) {
+        this->pitch = pitch;
     }
 
     //update the camera internal parameters following a camera move event
@@ -43,28 +58,22 @@ namespace gps {
         else if (direction == MOVE_DOWN) {
             this->cameraPosition -= cameraUpDirection * speed;
         }
+        this->cameraTarget = this->cameraPosition + this->cameraFrontDirection;
     }
 
     //update the camera internal parameters following a camera rotate event
     //yaw - camera rotation around the y axis
     //pitch - camera rotation around the x axis
+
     void Camera::rotate(float pitch, float yaw) {
         //TODO
         this->pitch += pitch;
-        this->yaw += yaw;
+        this->yaw += yaw; 
 
-
-        if (this->pitch > 89.0f) this->pitch = 89.0f;
-        if (this->pitch < -89.0f) this->pitch = -89.0f;
-
-
-        glm::vec3 front;
-        front.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-        front.y = sin(glm::radians(this->pitch));
-        front.z = sin(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-        this->cameraFrontDirection = glm::normalize(front);
-
-
-        this->cameraRightDirection = glm::normalize(glm::cross(this->cameraFrontDirection, cameraUpDirection));
+        glm::mat4 rotation = glm::yawPitchRoll(glm::radians(this->yaw), glm::radians(this->pitch), 0.0f);
+        this->cameraFrontDirection = glm::normalize(rotation * glm::vec4(glm::vec3(0.0f, 0.0f, -1.0f), 0.0f));
+        this->cameraRightDirection = -glm::normalize(glm::cross(-this->cameraFrontDirection, this->cameraSceneUpDirection));
+        this->cameraUpDirection = glm::cross(-this->cameraFrontDirection, this->cameraRightDirection);
+        this->cameraTarget = this->cameraPosition + this->cameraFrontDirection;
     }
 }
