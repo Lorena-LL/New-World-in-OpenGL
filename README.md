@@ -31,7 +31,7 @@ The project is developed in **Visual Studio**, utilizing **shadow mapping**, **f
 - **Mouse Movement** – Control camera inclination
 
 ## For Users 
-To run the project, download the necessary files from the **For_Users** folder. If you are only interested in running the simulation without modifying the code, simply execute the provided binaries.
+To run the project, download the folders models and shaders, and FinalOpenGL.exe from Lab2_project and you are ready to explore the scene.
 
 ## For those interested in the code
 In the folder Lab2_project you can find the .cpp and .hpp files with the code.
